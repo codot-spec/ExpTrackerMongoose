@@ -5,7 +5,7 @@ const expenseSchema = new mongoose.Schema({
   description: { type: String, required: true },
   category: { type: String, required: true },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Reference User model
-}, { timestamps: true }); // Add timestamps for createdAt and updatedAt
+}, { timestamps: true });
 
 const Expense = mongoose.model('Expense', expenseSchema);
 

@@ -18,10 +18,11 @@ exports.addExpense = async (req, res) => {
       req.user.totalExpenses += amount;
       await req.user.save();
 
-      res.status(201).json(newExpense);
+      // Explicit success response with the new expense data
+      res.status(201).json({ success: true, message: 'Expense added successfully', expense: newExpense }); // Include success flag and message
   } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Error adding expense', error: error.message });
+      console.error("Error adding expense:", error); // More specific logging
+      res.status(500).json({ success: false, message: 'Error adding expense', error: error.message }); // Include success flag and error details
   }
 };
 
@@ -43,7 +44,7 @@ exports.updateExpense = async (req, res) => {
       await Expense.findByIdAndUpdate(
           expenseId,
           { amount, description, category },
-          { new: true, runValidators: true } // Important: new: true to return updated document
+          { new: true, runValidators: true }
       );
 
       req.user.totalExpenses += diff;
@@ -97,7 +98,7 @@ function uploadToS3(data, filename) {
     Key: filename,  // Ensure filename is passed correctly
     Body: data,     // Body is the file content
     ACL: 'public-read',
-    ContentType: 'image/png'  // You can set the content type according to your file
+    ContentType: 'text/csv'  // You can set the content type according to your file
   };
 
   return new Promise((resolve, reject) => {
@@ -120,7 +121,7 @@ exports.downloadExpense = async (req, res) => {
     const stringifiedExpenses = JSON.stringify(expenses);
     const userId = req.user._id;
     const filename = `Expense${userId}/${new Date()}.txt`;
-    const fileUrl = await uploadToS3(stringifiedExpenses, filename);
+    const fileUrl = await uploadToS3(stringifiedExpenses, filename,'text/plain');
 
     const downloadedContent = new DownloadedContent({ userId, url: fileUrl, filename });
     await downloadedContent.save();
@@ -134,13 +135,33 @@ exports.downloadExpense = async (req, res) => {
 
 exports.getDownloadedContent = async (req, res) => {
   try {
-    const downloadedContents = await DownloadedContent.find({ userId: req.user._id });
-    res.status(200).json(downloadedContents);
+      const page = parseInt(req.query.page, 10) || 1;
+      const limit = parseInt(req.query.limit, 10) || 2;
+
+      const skip = (page - 1) * limit;
+      
+      const downloadedContents = await DownloadedContent.find({ userId: req.user._id })
+          .skip(skip)
+          .limit(limit);
+
+      const count = await DownloadedContent.countDocuments({ userId: req.user._id });
+      const totalPages = Math.ceil(count / limit);
+
+      res.status(200).json({
+          downloadedContents,
+          pagination: {
+              totalItems: count,
+              totalPages,
+              currentPage: page,
+              itemsPerPage: limit,
+          },
+      });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Error fetching downloaded content', error: err.message });
+      console.error(err);
+      res.status(500).json({ message: 'Error fetching downloaded content', error: err.message });
   }
 };
+
 
 exports.getExpenses = async (req, res) => {
     try {

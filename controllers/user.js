@@ -1,4 +1,8 @@
 const User = require('../models/users');
+const Expenses = require('../models/expenses');
+const Orders = require('../models/orders');
+const ContentLoaded = require('../models/contentloaded');
+const ForgotPassword = require('../models/forgotpassword');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -112,3 +116,89 @@ exports.deleteUser = async (req, res) => {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
+
+// Edit User functionality
+exports.editUser = async (req, res) => {
+    try {
+      const userId = req.params.userId;
+      const { name, email, password } = req.body;
+  
+      const user = await User.findById(userId); // Use findById for Mongoose
+  
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+  
+      if (req.user.id !== user._id.toString()) { // Compare IDs (convert to string)
+        return res.status(403).json({ message: 'You can only edit your own profile' });
+      }
+  
+      if (name) user.name = name;
+      if (email) user.email = email;
+  
+      if (password) {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        user.password = hashedPassword;
+      }
+  
+      await user.save(); // Use save() for Mongoose
+  
+      res.status(200).json({ message: 'User updated successfully', user });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Server error' });
+    }
+  };
+  
+  exports.deleteUser = async (req, res) => {
+    try {
+      const userId = req.params.userId;
+  
+      const user = await User.findById(userId); // Use findById
+  
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+  
+      if (req.user.id !== user._id.toString()) { // Compare IDs (convert to string)
+        return res.status(403).json({ message: 'You can only delete your own profile' });
+      }
+  
+      // Mongoose uses deleteMany for multiple deletions
+      await Expenses.deleteMany({ userId: userId });
+      await Orders.deleteMany({ userId: userId });
+      await ContentLoaded.deleteMany({ userId: userId });
+      await ForgotPassword.deleteMany({ userId: userId });
+  
+      await user.deleteOne(); // Use remove() for Mongoose
+  
+      res.status(200).json({ message: 'User deleted successfully' });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Server error' });
+    }
+  };
+  
+  exports.fetchUserProfile = async (req, res) => {
+    try {
+      const userId = req.params.userId;
+  
+      const user = await User.findById(userId); // Use findById
+  
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+  
+      const userProfile = {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        // password: user.password  // Don't send the password!
+      };
+  
+      res.status(200).json(userProfile);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Server error' });
+    }
+  };

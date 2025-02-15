@@ -5,11 +5,11 @@ const userSchema = new mongoose.Schema({
   email: {
     type: String,
     unique: true,
-    required: true, // Email should be required
+    required: true,
   },
   password: {
     type: String,
-    required: true, // Password should be required
+    required: true,
   },
   totalExpenses: {
     type: Number,
@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-}, { timestamps: true }); // Add timestamps
+}, { timestamps: true });
 
 const User = mongoose.model('User', userSchema);
 

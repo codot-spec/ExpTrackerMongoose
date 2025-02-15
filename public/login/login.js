@@ -11,7 +11,7 @@ async function SignIn(event){
         alert(response.data.message)
         localStorage.setItem('token',response.data.token);
 
-       window.location.href = "../expense/expense.html"
+       window.location.href = "../expense/expense-form/index.html"
      }
     catch(err){
       document.body.innerHTML += `<div style="color:red;"> ${err.message} <div> `

@@ -1,0 +1,95 @@
+/* style.css */
+
+/* Basic reset and box-sizing */
+html, body {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box; /* Include padding and border in element's total width and height */
+    font-family: sans-serif; /* Use a default sans-serif font */
+}
+
+/* Header styles */
+header {
+    background-color: #f0f0f0; /* Light gray background */
+    padding: 20px;
+    text-align: center; /* Center the heading */
+}
+
+h1 {
+    margin-bottom: 10px; /* Add some space below the heading */
+}
+
+/* Form container */
+form {
+    max-width: 500px; /* Limit the form width */
+    margin: 20px auto; /* Center the form */
+    padding: 20px;
+    border: 1px solid #ccc; /* Add a border */
+    border-radius: 5px; /* Round the corners */
+    background-color: #f9f9f9; /* Slightly off-white background */
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block; /* Make labels stack on top of inputs */
+    margin-bottom: 5px;
+}
+
+input[type="number"],
+input[type="text"],
+select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box; /* Ensure padding doesn't affect width */
+}
+
+button[type="submit"] {
+    background-color: #4CAF50; /* Green */
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%; /* Make the button take full width */
+}
+
+button[type="submit"]:hover {
+    background-color: #45a049; /* Darker green on hover */
+}
+
+/* Link styles */
+a {
+    display: block; /* Make the link a block element so it takes full width */
+    text-align: center;
+    margin-top: 20px;
+    color: #007bff; /* Blue link color */
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive design (example - adjust breakpoints as needed) */
+@media (max-width: 400px) {
+    form {
+        max-width: 90%; /* Make the form take up more of the screen width on smaller devices */
+    }
+}
+
+/* General utility classes */
+.container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.text-center {
+    text-align: center;
+}
+
